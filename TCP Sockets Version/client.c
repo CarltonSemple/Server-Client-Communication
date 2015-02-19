@@ -28,6 +28,7 @@
 #include <signal.h> // for killing child thread
 #include <pthread.h>
 
+// Thread function for continuously reading the server responses
 void *readResponse(void * socketArg)
 {
 	int socketFd, mlen, c;
@@ -62,26 +63,17 @@ int main()
 	// Reading thread variable
 	pthread_t readThread;
 
-   /* 
-    * Open a socket for Internet stream services.
-    */
+   // Open a socket for Internet stream services.
    sock = socket(AF_INET, SOCK_STREAM,0);
    if (sock == -1)
    {   perror("opening socket");
        exit(-1);
    }
 
-   /* The address structure requires an address family (Internet), a port
-    * for the server (32351) and an address for the machine (esus is
-    * 153.90.192.1).  Note that anyting that is not defined or a byte
-    * should be converted to the appropriate network byte order.  Look
-    * in in.h to see the address structure itself.  Just for fun, look at the
-    * function net_addr and see if you can convert 153.90.192.1 to
-    * the address more easily.*/
-    
-   addr.sin_family = AF_INET;
-   addr.sin_port = htons (12345);
-   in_address = 127 << 24 | 0 << 16 | 0 << 8 | 1;
+   // Address Setup ********
+   addr.sin_family = AF_INET;						// address family
+   addr.sin_port = htons (12345);					// Port for the server
+   in_address = 127 << 24 | 0 << 16 | 0 << 8 | 1;	// Local Address
    addr.sin_addr.s_addr = htonl (in_address);
    if (connect (sock, (struct sockaddr *) &addr, sizeof (struct sockaddr_in)) == -1)
    {   
@@ -108,13 +100,7 @@ int main()
 	// End the reading thread
 	pthread_join(readThread, NULL);
 
-   /* 
-    * Do a shutdown to gracefully terminate by saying - "no more data"
-    * and then close the socket -- the shutdown is optional in a one way
-    * communication that is going to terminate, but a good habit to get
-    * into. 
-    */
-
+   // Communicate that it's going to shut down
    if (shutdown(sock, 1) == -1)
    {  
       perror("on shutdown");

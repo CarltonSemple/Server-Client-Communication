@@ -68,13 +68,8 @@ int main()
 
 	for(;;)
 	{
-		/*
-		 * Wait for a client to connect.  When this happens, print out a 
-		 * message including the address of the client.  Note that clientsock
-		 * is a socket just like sock, except that it is specifically connected
-		 * to the client.  sock is used just to get connections.
-		 */
-
+		// Wait for a client to connect, with a socket just for the 
+		// connection between the server process and the client
 		addrsize = sizeof(struct sockaddr_in);
 		clientsock = accept(sock, (struct sockaddr *) &addr, &addrsize);
 		if (clientsock == -1)
